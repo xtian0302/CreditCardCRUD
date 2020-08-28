@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 
 namespace CreditCardCRUD
 {
@@ -26,8 +27,16 @@ namespace CreditCardCRUD
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            //Disable Camel Casing Conversion for Json 
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {  var resolver = options.SerializerSettings.ContractResolver; 
+               if(resolver!=null)
+                {
+                    (resolver as DefaultContractResolver).NamingStrategy = null;
+                }
+            });
             services.AddDbContext<PaymenDetailContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
